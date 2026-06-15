@@ -1,6 +1,6 @@
 # HireLens – AI Resume Analyzer & ATS Score Predictor (V1)
 
-HireLens is a professional AI-powered web application that helps students, freshers, and job seekers optimize their resumes for Applicant Tracking Systems (ATS).
+HireLens is an AI-powered Resume Analyzer designed to help students and job seekers improve their resumes for Applicant Tracking Systems (ATS). The platform analyzes resumes, predicts ATS scores, extracts skills, matches resumes against job descriptions, and provides actionable recommendations to increase interview opportunities.
 
 ---
 
@@ -24,6 +24,22 @@ HireLens is a professional AI-powered web application that helps students, fresh
 6. **Verb Quality Inspector**: Scans resumes for weak words and lists stronger alternatives.
 7. **Score Gain Predictor**: Outlines potential score gains if action items are implemented.
 8. **Analysis History**: Manages past reports in local SQLite storage.
+
+---
+## Why I Built This
+
+Many candidates are rejected by ATS systems before their resumes reach recruiters. HireLens was developed to help users identify missing keywords, improve resume quality, and better align their profiles with job requirements.
+
+---
+## Project Highlights
+
+- ATS Score Prediction (0–100)
+- Resume Skill Extraction
+- Job Description Matching
+- Missing Keyword Detection
+- Resume Improvement Suggestions
+- Weak Verb Analysis
+- Historical Report Tracking
 
 ---
 
@@ -60,7 +76,24 @@ npm run dev
 The React frontend will be available at `http://localhost:5173`.
 
 ---
+## Future Enhancements
 
-## Demo Credentials
-- **Email**: `demo@hirelens.com`
-- **Password**: `123456`
+- Resume Builder
+- AI Resume Rewrite Suggestions
+- Cover Letter Generator
+- Interview Question Generator
+- Multi-Resume Comparison
+- Resume Ranking System
+
+---
+## Author
+
+Vanshita Shivankar
+
+Third-Year Information Technology Engineering Student
+
+GitHub: https://github.com/vanshita-html
+
+---
+
+NLP • ATS Optimization • Resume Parsing • TF-IDF • Cosine Similarity • Machine Learning • FastAPI • React • SQLite • Python
