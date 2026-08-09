@@ -26,7 +26,10 @@ app = FastAPI(
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust for production
+    allow_origins=[
+        "http://localhost:5173",
+        "https://hirelens-ai-resume-analyzer.vercel.app",  # placeholder — update after Part 3
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
