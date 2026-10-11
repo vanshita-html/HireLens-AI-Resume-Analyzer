@@ -1,38 +1,45 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
+import NotFoundPage from './pages/NotFoundPage';
 
-// Router guard
+// Protected Route Guard
 const PrivateRoute = ({ children }) => {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  return isLoggedIn ? children : <Navigate to="/login" replace />;
+  const location = useLocation();
+  const token = localStorage.getItem('hirelens_token');
+
+  if (!token) {
+    const returnPath = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/login?redirect=${returnPath}`} replace />;
+  }
+
+  return children;
 };
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route 
-          path="/" 
-          element={
-            <PrivateRoute>
-              <LandingPage />
-            </PrivateRoute>
-          } 
-        />
+        {/* Public Landing Page */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Authentication Page */}
         <Route path="/login" element={<LoginPage />} />
-        <Route 
-          path="/dashboard" 
+
+        {/* Protected Dashboard Route */}
+        <Route
+          path="/dashboard"
           element={
             <PrivateRoute>
               <Dashboard />
             </PrivateRoute>
-          } 
+          }
         />
-        {/* Fallback to home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+
+        {/* 404 Not Found */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

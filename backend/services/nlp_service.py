@@ -2,7 +2,7 @@ import re
 import spacy
 import sys
 import subprocess
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 nlp = None
 
@@ -24,31 +24,62 @@ def get_spacy_nlp():
 
 # Predefined skill database categorised
 SKILL_CATEGORIES = {
-    "Programming": ["Java", "Python", "C\\+\\+", "JavaScript", "SQL", "TypeScript", "Ruby", "Go", "Rust", "C#", "PHP", "Kotlin", "Swift"],
-    "Web Development": ["React", "Node\\.js", "Express", "HTML", "CSS", "Angular", "Vue", "Next\\.js", "Django", "Flask", "Bootstrap", "Tailwind", "Svelte", "jQuery", "Webflow"],
-    "AI / ML": ["Machine Learning", "Deep Learning", "TensorFlow", "PyTorch", "NLP", "Natural Language Processing", "Computer Vision", "Scikit-learn", "Keras", "spaCy", "NLTK", "OpenCV", "Hugging Face"],
-    "Data Analytics": ["Power BI", "Tableau", "Excel", "Pandas", "NumPy", "Spark", "Hadoop", "Matplotlib", "Seaborn", "SQL Server", "PostgreSQL", "MongoDB", "MySQL"]
+    "Programming": ["Java", "Python", "C\\+\\+", "JavaScript", "SQL", "TypeScript", "Ruby", "Go", "Rust", "C#", "PHP", "Kotlin", "Swift", "Bash"],
+    "Web Development": ["React", "Node\\.js", "Express", "HTML", "CSS", "Angular", "Vue", "Next\\.js", "Django", "Flask", "Bootstrap", "Tailwind", "Svelte", "jQuery", "GraphQL", "Redux"],
+    "AI / ML": ["Machine Learning", "Deep Learning", "TensorFlow", "PyTorch", "NLP", "Natural Language Processing", "Computer Vision", "Scikit-learn", "Keras", "spaCy", "NLTK", "OpenCV", "Hugging Face", "MLflow"],
+    "Data Analytics": ["Power BI", "Tableau", "Excel", "Pandas", "NumPy", "Spark", "Hadoop", "Matplotlib", "Seaborn", "PostgreSQL", "MongoDB", "MySQL", "Redis"],
+    "Cloud & DevOps": ["Docker", "Kubernetes", "AWS", "Azure", "GCP", "CI/CD", "Git", "GitHub", "Linux", "Terraform", "Microservices"]
 }
 
-# General high-demand keywords to check/suggest
+# Role-specific keywords for targeted keyword matching
+ROLE_KEYWORDS: Dict[str, List[str]] = {
+    "Full-Stack Developer": [
+        "React", "Node.js", "TypeScript", "REST API", "PostgreSQL", "Docker", "Git", "Redux", "Tailwind", "CI/CD", "Next.js", "Express", "MongoDB", "Unit Testing", "Microservices"
+    ],
+    "Frontend Developer": [
+        "React", "JavaScript", "TypeScript", "HTML", "CSS", "Tailwind", "Next.js", "Redux", "Webpack", "Responsive Design", "UI/UX", "Jest", "Git", "Performance Optimization"
+    ],
+    "Backend Developer": [
+        "Python", "Node.js", "FastAPI", "Django", "SQL", "PostgreSQL", "Docker", "Redis", "Microservices", "REST API", "Git", "Kubernetes", "AWS", "Database Design", "Security"
+    ],
+    "Data Analyst": [
+        "Python", "SQL", "Excel", "Power BI", "Tableau", "Pandas", "NumPy", "Data Visualization", "Statistics", "ETL", "Matplotlib", "Seaborn", "PostgreSQL", "Data Cleansing"
+    ],
+    "Machine Learning Engineer": [
+        "Python", "Machine Learning", "Deep Learning", "TensorFlow", "PyTorch", "Scikit-learn", "NLP", "Computer Vision", "Docker", "AWS", "MLflow", "Pandas", "Model Evaluation"
+    ],
+    "DevOps / Cloud Engineer": [
+        "Docker", "Kubernetes", "AWS", "CI/CD", "Linux", "Terraform", "Git", "Python", "Bash", "Prometheus", "Cloud Computing", "Monitoring", "Security"
+    ],
+    "Mobile App Developer": [
+        "Kotlin", "Swift", "React Native", "Flutter", "iOS", "Android", "REST API", "Git", "Firebase", "Mobile UI", "TypeScript", "App Store Deployment"
+    ]
+}
+
+# General recommended keywords
 RECOMMENDED_KEYWORDS = [
     "Docker", "AWS", "REST API", "CI/CD", "Git", "GitHub", "FastAPI", "Kubernetes", "Jira", "Agile",
     "Cloud Computing", "Microservices", "Unit Testing", "System Design", "GraphQL", "Redis", "Docker Compose"
 ]
 
 WEAK_VERBS_MAP = {
-    "worked on": ["Developed", "Engineered", "Designed", "Architected", "Spearheaded"],
-    "helped with": ["Collaborated on", "Assisted in", "Facilitated", "Contributed to"],
-    "responsible for": ["Led", "Executed", "Managed", "Directed", "Oversaw"],
-    "assisted in": ["Collaborated on", "Supported", "Aided", "Partnered in"],
-    "participated in": ["Engaged in", "Contributed to", "Partnered in", "Cooperated in"],
-    "handled": ["Managed", "Orchestrated", "Administered", "Executed"],
-    "took care of": ["Managed", "Supervised", "Maintained", "Optimized"]
+    "worked on": ["Architected", "Engineered", "Spearheaded", "Implemented", "Delivered"],
+    "helped with": ["Co-engineered", "Accelerated", "Collaborated on", "Streamlined", "Contributed to"],
+    "responsible for": ["Owned", "Spearheaded", "Directed", "Executed", "Administered"],
+    "assisted in": ["Partnered in", "Reinforced", "Facilitated", "Collaborated on"],
+    "participated in": ["Co-developed", "Spearheaded initiative in", "Contributed to", "Coordinated"],
+    "handled": ["Orchestrated", "Resolved", "Managed", "Optimized", "Scaled"],
+    "took care of": ["Oversaw", "Administered", "Streamlined", "Resolved"],
+    "did": ["Executed", "Implemented", "Constructed", "Achieved"],
+    "made": ["Constructed", "Authored", "Established", "Generated"],
+    "involved in": ["Pioneered", "Partnered in", "Designed", "Executed"],
+    "looked after": ["Maintained", "Safeguarded", "Supervised", "Monitored"],
+    "supported": ["Maintained reliability of", "Reinforced", "Upgraded", "Bolstered"]
 }
 
 def extract_personal_info(text: str) -> Dict[str, Any]:
     """
-    Extracts name, email, phone, and links using regex and spaCy.
+    Extracts name, email, phone, and links using regex and spaCy heuristics.
     """
     info = {
         "name": None,
@@ -66,7 +97,7 @@ def extract_personal_info(text: str) -> Dict[str, Any]:
     if email_match:
         info["email"] = email_match.group(0)
         
-    # 2. Phone Regex (supports formats like +1-234-567-8900, (123) 456-7890, etc.)
+    # 2. Phone Regex
     phone_match = re.search(r'(?:(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}|\+?\d{9,13})', text)
     if phone_match:
         info["phone"] = phone_match.group(0)
@@ -81,17 +112,13 @@ def extract_personal_info(text: str) -> Dict[str, Any]:
         info["github"] = github_match.group(0)
         
     # 4. Name extraction
-    # Heuristic: The name is usually at the top. Let's look at the first 3 lines.
-    # Exclude lines that contain emails, phone numbers, website links, or common section titles.
-    common_exclusions = ["resume", "cv", "curriculum vitae", "education", "experience", "skills", "summary"]
+    common_exclusions = ["resume", "cv", "curriculum vitae", "education", "experience", "skills", "summary", "profile", "contact"]
     potential_names = []
     
     for line in lines[:5]:
         line_lower = line.lower()
-        # Skip if contains contact elements
         if "@" in line or "http" in line or "linkedin" in line or "github" in line or any(ex in line_lower for ex in common_exclusions):
             continue
-        # Check if line looks like a name (2-3 words, mostly alphabetic)
         words = line.split()
         if 2 <= len(words) <= 4 and all(w.isalpha() or w.replace(".", "").isalpha() for w in words):
             potential_names.append(line)
@@ -99,13 +126,12 @@ def extract_personal_info(text: str) -> Dict[str, Any]:
     if potential_names:
         info["name"] = potential_names[0]
     else:
-        # Fallback to spaCy PERSON NER if available
+        # Fallback to spaCy PERSON NER
         sp_nlp = get_spacy_nlp()
         if sp_nlp:
-            doc = sp_nlp(text[:1000]) # Scan first 1000 characters
+            doc = sp_nlp(text[:1000])
             for ent in doc.ents:
                 if ent.label_ == "PERSON":
-                    # Simple sanitization
                     name_words = ent.text.strip().split()
                     if 1 < len(name_words) <= 3 and "\n" not in ent.text:
                         info["name"] = ent.text.strip()
@@ -120,19 +146,17 @@ def check_section_presence(text: str) -> Dict[str, bool]:
     text_lower = text.lower()
     
     sections = {
-        "education": ["education", "academic", "university", "college", "school", "qualification"],
-        "skills": ["skills", "technical skills", "technologies", "expertise", "proficiencies", "core competencies"],
-        "experience": ["experience", "employment", "work history", "professional experience", "internship", "professional background"],
-        "projects": ["projects", "academic projects", "key projects", "personal projects"],
-        "certifications": ["certifications", "certificates", "courses", "licenses"]
+        "education": ["education", "academic", "university", "college", "school", "qualification", "bachelor", "master"],
+        "skills": ["skills", "technical skills", "technologies", "expertise", "proficiencies", "core competencies", "tools"],
+        "experience": ["experience", "employment", "work history", "professional experience", "internship", "work experience", "career"],
+        "projects": ["projects", "academic projects", "key projects", "personal projects", "portfolio"],
+        "certifications": ["certifications", "certificates", "courses", "licenses", "credentials"]
     }
     
     presence = {}
     for section, keywords in sections.items():
-        # Match as whole word or section header line
         found = False
         for kw in keywords:
-            # Look for keyword with boundary
             pattern = rf'\b{re.escape(kw)}\b'
             if re.search(pattern, text_lower):
                 found = True
@@ -143,15 +167,13 @@ def check_section_presence(text: str) -> Dict[str, bool]:
 
 def extract_skills(text: str) -> List[str]:
     """
-    Extracts matches for skills defined in SKILL_CATEGORIES.
+    Extracts matches for skills defined across all categories.
     """
     found_skills = set()
     text_lower = text.lower()
     
     for category, skills in SKILL_CATEGORIES.items():
         for skill in skills:
-            # Clean skill search pattern
-            # Replace C\\+\\+ pattern with custom boundary check because + isn't a word character
             if skill == "C\\+\\+":
                 pattern = r'\bc\+\+'
             elif skill == "C#":
@@ -163,95 +185,133 @@ def extract_skills(text: str) -> List[str]:
             elif skill == "Express":
                 pattern = r'\bexpress\b'
             else:
-                # Standard word boundaries
                 pattern = rf'\b{re.escape(skill.lower())}\b'
                 
             if re.search(pattern, text_lower):
-                # Save display name of skill (strip regex escape characters if any)
                 display_name = skill.replace("\\", "")
                 found_skills.add(display_name)
                 
     return sorted(list(found_skills))
 
+def extract_quantified_metrics(text: str) -> List[str]:
+    """
+    Extracts measurable, data-driven accomplishments and metrics from resume text.
+    """
+    pattern = r'(\b\d+(?:\.\d+)?%|\b\d+(?:\.\d+)?x\b|\b\d+\+?\s*(?:users|clients|customers|requests|queries|endpoints|teams|engineers|projects|stars|downloads|dau|mau|qps|rps|tps|ms|seconds|minutes|hours|days|weeks|months|percent)\b|[\$€£]\d+(?:[,\.]\d+)?(?:\s*(?:k|m|million|thousand|billion))?|\b\d+(?:\.\d+)?[kKmM]\+?\b)'
+    matches = re.findall(pattern, text, re.IGNORECASE)
+    return matches
+
+def get_contextual_replacement(weak_phrase: str, line: str, start: int, end: int) -> List[str]:
+    """
+    Determines action verb alternatives based on the immediate sentence and clause context.
+    """
+    window = line[start:min(len(line), end + 90)].lower()
+    full = line.lower()
+    ctx = window if len(window) > 10 else full
+
+    # 1. Machine Learning, Preprocessing, Training & Data Pipelines
+    if any(k in ctx for k in ["preprocess", "train", "dataset", "deep learning", "machine learning", "neural", "model", "pipeline"]):
+        return ["Implemented", "Built", "Developed"]
+    # 2. Backend, API, Database & Infrastructure
+    if any(k in ctx for k in ["api", "backend", "microservice", "database", "infrastructure", "server", "endpoint", "query"]):
+        return ["Architected", "Engineered", "Developed"]
+    # 3. Frontend, UI, UX & Components
+    if any(k in ctx for k in ["frontend", "ui", "ux", "component", "dashboard", "interface", "react", "css", "layout"]):
+        return ["Designed", "Crafted", "Built"]
+    # 4. Performance, Optimization & Scalability
+    if any(k in ctx for k in ["optimiz", "latenc", "throughput", "scale", "scaling", "performan", "speed", "efficien"]):
+        return ["Optimized", "Accelerated", "Streamlined"]
+    # 5. Bugs, Issues & Troubleshooting
+    if any(k in ctx for k in ["bug", "issue", "ticket", "incident", "defect", "fix", "troubleshoot"]):
+        return ["Resolved", "Diagnosed", "Remediated"]
+    # 6. Testing, QA & Verification
+    if any(k in ctx for k in ["test", "qa", "coverage", "unit test", "validation", "audit"]):
+        return ["Automated", "Validated", "Executed"]
+    # 7. Team, Stakeholder & Project Leadership
+    if any(k in ctx for k in ["team", "stakeholder", "cross-functional", "lead", "deliverable", "initiative"]):
+        return ["Spearheaded", "Directed", "Orchestrated"]
+
+    # Fallback to predefined mapped verbs
+    base = WEAK_VERBS_MAP.get(weak_phrase.lower(), ["Engineered", "Implemented", "Spearheaded"])
+    return base[:3]
+
 def analyze_weak_verbs(text: str) -> List[Dict[str, str]]:
     """
-    Finds instances of weak resume language and suggests strong replacements.
+    Finds all instances of weak resume language across all lines and provides context-aware strong replacements.
+    Detects and lists all weak phrases, not just the first one.
     """
     weak_findings = []
     lines = text.split("\n")
     
     for line in lines:
         line_clean = line.strip()
-        if not line_clean:
+        if not line_clean or len(line_clean) < 8:
             continue
         line_lower = line_clean.lower()
         
-        for weak_phrase, improvements in WEAK_VERBS_MAP.items():
+        # Track occupied index ranges on this line to avoid overlapping matches
+        occupied_spans = []
+        line_matches = []
+        
+        # Sort by length descending to match multi-word phrases first
+        for weak_phrase in sorted(WEAK_VERBS_MAP.keys(), key=len, reverse=True):
             pattern = rf'\b{re.escape(weak_phrase)}\b'
-            match = re.search(pattern, line_lower)
-            if match:
-                # Found weak verb! Construct context
-                # Highlight weak verb in context, or provide context sentence
-                weak_findings.append({
-                    "weak": line_clean[match.start():match.end()],
-                    "replacement": improvements[0] + " (or " + ", ".join(improvements[1:]) + ")",
-                    "context": line_clean
-                })
-                break # Move to next line once one weak verb is found on it
+            for m in re.finditer(pattern, line_lower):
+                start, end = m.start(), m.end()
+                if any(start < o_end and end > o_start for o_start, o_end in occupied_spans):
+                    continue
+                occupied_spans.append((start, end))
+                line_matches.append((start, end, weak_phrase))
                 
-    return weak_findings[:10] # limit to top 10 weak verbs
+        # Sort line matches by position in line
+        line_matches.sort(key=lambda x: x[0])
+        for start, end, phrase in line_matches:
+            matched_text = line_clean[start:end]
+            alts = get_contextual_replacement(phrase, line_clean, start, end)
+            weak_findings.append({
+                "weak": matched_text,
+                "replacement": ", ".join(alts),
+                "context": line_clean[:180] + ("..." if len(line_clean) > 180 else "")
+            })
+                
+    return weak_findings[:30]
 
-def analyze_keywords(text: str, skills_found: List[str]) -> Dict[str, Any]:
+
+def analyze_keywords(text: str, skills_found: List[str], target_role: Optional[str] = None) -> Dict[str, Any]:
     """
-    Generates a list of missing, frequently used, and recommended keywords.
+    Generates a list of frequently used, missing, and recommended keywords,
+    tailored to the target_role if provided.
     """
     text_lower = text.lower()
     
-    # 1. Frequently Used Keywords:
-    # Look for words in text and count. We can filter for tech words or just general nouns/skills.
-    # Let's count occurrences of skills_found
+    # 1. Frequently Used Keywords
     freq_keywords = []
     for skill in skills_found:
         count = len(re.findall(rf'\b{re.escape(skill.lower())}\b', text_lower))
-        if count >= 2:
+        if count >= 1:
             freq_keywords.append({"keyword": skill, "count": count})
             
-    # Sort by count descending
-    freq_keywords = sorted(freq_keywords, key=lambda x: x["count"], reverse=True)[:5]
+    freq_keywords = sorted(freq_keywords, key=lambda x: x["count"], reverse=True)[:8]
     
-    # 2. Recommended Keywords:
-    # High-demand tech stack keywords that are general but fit nicely.
+    # 2. Missing Keywords based on Target Role
+    missing = []
+    role_candidates = ROLE_KEYWORDS.get(target_role or "Full-Stack Developer", ROLE_KEYWORDS["Full-Stack Developer"])
+    
+    for kw in role_candidates:
+        pattern = rf'\b{re.escape(kw.lower())}\b'
+        if not re.search(pattern, text_lower):
+            missing.append(kw)
+            
+    # 3. Recommended Keywords
     recommended = []
     for kw in RECOMMENDED_KEYWORDS:
-        if kw.lower() not in text_lower:
+        pattern = rf'\b{re.escape(kw.lower())}\b'
+        if not re.search(pattern, text_lower) and kw not in missing:
             recommended.append(kw)
             
-    # 3. Missing Keywords:
-    # Keywords that fit their profile. E.g., if they do Python/ML, they might miss PyTorch/Tensorflow.
-    # Let's define a simple mapping of profile keywords:
-    missing = []
-    profile_rules = {
-        "react": ["Redux", "TypeScript", "Webpack", "Tailwind CSS", "Jest"],
-        "python": ["Django", "Flask", "Docker", "Pytest", "Git"],
-        "machine learning": ["PyTorch", "TensorFlow", "MLflow", "Docker", "AWS"],
-        "sql": ["PostgreSQL", "Database Design", "Redis", "NoSQL"]
-    }
-    
-    skills_lower = [s.lower() for s in skills_found]
-    for key_skill, missing_candidates in profile_rules.items():
-        if key_skill in skills_lower:
-            for candidate in missing_candidates:
-                if candidate.lower() not in text_lower:
-                    missing.append(candidate)
-                    
-    # Remove duplicates from missing and make sure they are not in recommended
-    missing = list(set(missing))[:6]
-    # If missing is empty, provide a default list of tech standard tools
-    if not missing:
-        missing = [kw for kw in RECOMMENDED_KEYWORDS[:5] if kw.lower() not in text_lower]
-        
     return {
         "frequent": freq_keywords,
-        "missing": missing,
-        "recommended": recommended[:6]
+        "missing": missing[:8],
+        "recommended": recommended[:8],
+        "target_role": target_role or "Full-Stack Developer"
     }

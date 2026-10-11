@@ -5,3 +5,6 @@ pymupdf
 spacy
 scikit-learn
 pydantic
+bcrypt
+pyjwt
+psycopg2-binary

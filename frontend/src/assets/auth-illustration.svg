@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5F3FF" />
+      <stop offset="100%" stop-color="#EDE9FE" />
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#6D28D9" />
+    </linearGradient>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#7C3AED" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="500" height="500" rx="24" fill="url(#bgGrad)" />
+
+  <!-- Subtle Decorative Circles -->
+  <circle cx="80" cy="90" r="45" fill="#DDD6FE" opacity="0.4" />
+  <circle cx="420" cy="400" r="60" fill="#C4B5FD" opacity="0.3" />
+  <circle cx="440" cy="110" r="28" fill="#A78BFA" opacity="0.25" />
+
+  <!-- Central Resume Document Card -->
+  <g filter="url(#cardShadow)">
+    <rect x="180" y="70" width="220" height="300" rx="16" fill="#FFFFFF" />
+    
+    <!-- Document Header & Lines -->
+    <rect x="210" y="105" width="80" height="12" rx="6" fill="#7C3AED" />
+    <rect x="210" y="127" width="120" height="6" rx="3" fill="#DDD6FE" />
+    <rect x="210" y="145" width="160" height="4" rx="2" fill="#E2E8F0" />
+    <rect x="210" y="157" width="140" height="4" rx="2" fill="#E2E8F0" />
+    <rect x="210" y="169" width="150" height="4" rx="2" fill="#E2E8F0" />
+
+    <!-- Skill Chips in Document -->
+    <rect x="210" y="195" width="45" height="16" rx="8" fill="#F3E8FF" />
+    <text x="232" y="207" font-family="system-ui, sans-serif" font-size="9" fill="#7C3AED" font-weight="bold" text-anchor="middle">REACT</text>
+
+    <rect x="263" y="195" width="50" height="16" rx="8" fill="#F3E8FF" />
+    <text x="288" y="207" font-family="system-ui, sans-serif" font-size="9" fill="#7C3AED" font-weight="bold" text-anchor="middle">PYTHON</text>
+
+    <rect x="320" y="195" width="40" height="16" rx="8" fill="#F3E8FF" />
+    <text x="340" y="207" font-family="system-ui, sans-serif" font-size="9" fill="#7C3AED" font-weight="bold" text-anchor="middle">SQL</text>
+
+    <!-- Lower Section Lines -->
+    <rect x="210" y="235" width="60" height="8" rx="4" fill="#8B5CF6" />
+    <rect x="210" y="253" width="155" height="4" rx="2" fill="#E2E8F0" />
+    <rect x="210" y="265" width="135" height="4" rx="2" fill="#E2E8F0" />
+    <rect x="210" y="277" width="145" height="4" rx="2" fill="#E2E8F0" />
+    <rect x="210" y="289" width="110" height="4" rx="2" fill="#E2E8F0" />
+  </g>
+
+  <!-- ATS Score Badge on Document -->
+  <g transform="translate(330, 85)">
+    <circle cx="28" cy="28" r="28" fill="url(#badgeGrad)" />
+    <circle cx="28" cy="28" r="24" fill="#FFFFFF" />
+    <text x="28" y="26" font-family="system-ui, sans-serif" font-size="14" font-weight="900" fill="#059669" text-anchor="middle">94</text>
+    <text x="28" y="38" font-family="system-ui, sans-serif" font-size="8" font-weight="700" fill="#10B981" text-anchor="middle">ATS</text>
+    <!-- Verified Mini Checkmark -->
+    <circle cx="48" cy="12" r="9" fill="#10B981" />
+    <path d="M44.5 12 L47 14.5 L51.5 9.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  </g>
+
+  <!-- Security Shield & Lock Badge (representing secure authentication) -->
+  <g transform="translate(290, 310)" filter="url(#cardShadow)">
+    <rect x="0" y="0" width="80" height="80" rx="20" fill="#FFFFFF" />
+    <circle cx="40" cy="40" r="26" fill="#F5F3FF" />
+    <path d="M40 24 C34 24 30 28 30 33 L30 36 C28 36 27 37.5 27 39.5 L27 49.5 C27 51.5 28.5 53 30.5 53 L49.5 53 C51.5 53 53 51.5 53 49.5 L53 39.5 C53 37.5 51.5 36 49.5 36 L49.5 33 C49.5 28 45.5 24 40 24 Z M37 36 L37 33 C37 31.5 38.3 30 40 30 C41.7 30 43 31.5 43 33 L43 36 L37 36 Z" fill="url(#purpleGrad)" />
+    <circle cx="40" cy="44" r="2.5" fill="#FFFFFF" />
+  </g>
+
+  <!-- Person Sitting with Laptop (Flat Vector Art) -->
+  <g transform="translate(60, 160)">
+    <!-- Shadow under chair/person -->
+    <ellipse cx="90" cy="270" rx="75" ry="14" fill="#C4B5FD" opacity="0.4" />
+
+    <!-- Modern Minimalist Stool / Seat -->
+    <path d="M70 230 L55 270 M105 230 L120 270" stroke="#7C3AED" stroke-width="4" stroke-linecap="round" />
+    <rect x="58" y="222" width="60" height="10" rx="5" fill="#6D28D9" />
+
+    <!-- Legs & Body -->
+    <!-- Legs -->
+    <path d="M85 220 L115 220 L135 260" stroke="#4C1D95" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M75 220 L95 230 L110 270" stroke="#5B21B6" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    
+    <!-- Torso / Shirt -->
+    <path d="M65 150 C65 130 90 125 105 135 L105 220 L65 215 Z" fill="url(#purpleGrad)" />
+
+    <!-- Neck & Head -->
+    <rect x="85" y="115" width="12" height="16" rx="4" fill="#FBBF24" />
+    <!-- Hair -->
+    <path d="M78 88 C78 72 108 72 112 85 C114 95 110 102 108 106 L82 106 C80 98 78 94 78 88 Z" fill="#312E81" />
+    <!-- Face -->
+    <circle cx="94" cy="98" r="14" fill="#FCD34D" />
+    <!-- Ear -->
+    <circle cx="83" cy="99" r="3.5" fill="#FBBF24" />
+
+    <!-- Arms & Laptop -->
+    <path d="M75 145 L110 175 L135 170" stroke="#8B5CF6" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    
+    <!-- Laptop Base & Screen -->
+    <polygon points="120,175 165,175 175,170 130,170" fill="#94A3B8" />
+    <polygon points="135,140 168,140 165,170 132,170" fill="#CBD5E1" />
+    <polygon points="138,144 165,144 162,168 135,168" fill="#4F46E5" />
+    <!-- Glowing code lines on screen -->
+    <line x1="141" y1="150" x2="160" y2="150" stroke="#A5B4FC" stroke-width="2" stroke-linecap="round" />
+    <line x1="141" y1="156" x2="155" y2="156" stroke="#A5B4FC" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <!-- Floating Sparkles & Success Badges -->
+  <g transform="translate(145, 90)">
+    <circle cx="10" cy="10" r="8" fill="#8B5CF6" opacity="0.2" />
+    <path d="M10 4 L11.5 8.5 L16 10 L11.5 11.5 L10 16 L8.5 11.5 L4 10 L8.5 8.5 Z" fill="#7C3AED" />
+  </g>
+
+  <g transform="translate(380, 260)">
+    <circle cx="8" cy="8" r="6" fill="#10B981" opacity="0.25" />
+    <path d="M8 3 L9.2 6.8 L13 8 L9.2 9.2 L8 13 L6.8 9.2 L3 8 L6.8 6.8 Z" fill="#10B981" />
+  </g>
+</svg>

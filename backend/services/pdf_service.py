@@ -1,11 +1,11 @@
-import fitz
+import pymupdf
 
 def extract_text_from_pdf(pdf_bytes: bytes) -> str:
     """
-    Extracts text from PDF bytes using PyMuPDF (fitz).
+    Extracts text from PDF bytes using PyMuPDF.
     """
     try:
-        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
         text = ""
         for page in doc:
             text += page.get_text()
@@ -16,10 +16,10 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
 
 def extract_text_from_pdf_path(pdf_path: str) -> str:
     """
-    Extracts text from PDF file path using PyMuPDF (fitz).
+    Extracts text from PDF file path using PyMuPDF.
     """
     try:
-        doc = fitz.open(pdf_path)
+        doc = pymupdf.open(pdf_path)
         text = ""
         for page in doc:
             text += page.get_text()
