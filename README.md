@@ -44,25 +44,7 @@ HireLens is a production-ready, AI-powered Resume Analyzer designed to help stud
 
 ---
 
-## Screenshots Placeholder
 
-```
-+---------------------------------------------------------------+
-|                      [Landing Page Hero]                     |
-|            AI-Powered ATS Diagnostics & Features              |
-+---------------------------------------------------------------+
-|                       [Split-Screen Auth]                     |
-|           Vector Illustration + Sign In & Register Tabs       |
-+---------------------------------------------------------------+
-|                      [Overview Dashboard]                     |
-|       ATS Score Gauge + Factor Breakdown + Projected Gain     |
-+---------------------------------------------------------------+
-|                      [JD Matcher & History]                   |
-|       Matching vs Missing Skills Chips + Sample JDs           |
-+---------------------------------------------------------------+
-```
-
----
 
 ## Environment Variables
 
@@ -81,13 +63,7 @@ HireLens is a production-ready, AI-powered Resume Analyzer designed to help stud
 
 ---
 
-## Free-Tier Cold Start Note
 
-> **Note on Free Hosting on Render**:  
-> Render spins down free web services after 15 minutes of inactivity. When a request is made after an idle period, it can take 30 to 60 seconds for the container to wake up.  
-> HireLens includes automatic client retries, an app-startup health ping (`GET /health`), and a clear loading status banner (*"Waking up the server (free hosting), this can take up to a minute..."*) so users are always informed rather than seeing generic timeout errors.
-
----
 
 ## Local Installation & Manual Run Guide
 
